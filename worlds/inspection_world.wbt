@@ -1,0 +1,106 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/SandyGround.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/road/protos/Road.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Pavement.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/Windmill.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/SmallManor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/manhole/protos/SquareManhole.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/CardboardBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/vehicles/protos/tesla/TeslaModel3Simple.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro.proto"
+
+WorldInfo {
+  info [
+    "This demonstration shows a DJI Mavic 2 PRO flying over a rural area."
+    "After the drone has taken off, you can control it with the keyboard of your computer."
+  ]
+  title "DJI Mavic 2 PRO demo"
+  basicTimeStep 8
+  defaultDamping Damping {
+    linear 0.5
+    angular 0.5
+  }
+}
+Viewpoint {
+  orientation -0.04675703012545317 0.00012944873981795814 0.9989062835806325 2.79169084362618
+  position -37.38812432301582 16.544327869316373 0.06505781073508206
+  near 0.2
+  follow "Mavic 2 PRO"
+  followSmoothness 0.2
+}
+TexturedBackground {
+  luminosity 3
+}
+TexturedBackgroundLight {
+}
+Floor {
+  size 400 400
+  tileSize 6 6
+  appearance SandyGround {
+  }
+}
+Road {
+  translation -43.8 9.2 0.01
+  rotation 0 0 1 -0.3926996938995747
+  width 3
+  numberOfLanes 1
+  rightBorder FALSE
+  leftBorder FALSE
+  wayPoints [
+    0 0 0
+    100 0 0
+    200 200 0
+  ]
+  splineSubdivision 8
+  appearance Pavement {
+    type "black stone"
+  }
+}
+Windmill {
+  translation -12.3483 12.4867 -6.2516e-07
+  rotation -7.19228e-09 2.6842e-08 1 0.523601
+}
+SmallManor {
+  translation -50.35 11.25 0
+  rotation 0 0 -1 0.392394
+}
+SquareManhole {
+  translation -39.2491 17.3113 -0.03
+  rotation 0 0 -1 0.392394
+}
+CardboardBox {
+  translation -0.730157 -1.22891 0.3
+  rotation 0 0 1 -1.8325953071795862
+}
+TeslaModel3Simple {
+  translation -41.5139 4.34169 0.31
+  rotation 0 0 1 -0.2618053071795865
+}
+Mavic2Pro {
+  hidden position_0_0 7.504797348527249e-13
+  hidden linearVelocity_0 3.3258879513308814e-05 8.27979190209603e-05 0.0006592570855974416
+  hidden angularVelocity_0 -0.004045574711877794 0.0016250337857369364 -9.195226997148235e-09
+  hidden position_5_0 -6.237800355577816e-09
+  hidden linearVelocity_5 9.827202412197124e-05 0.0002461081312255851 0.001194009405351074
+  hidden angularVelocity_5 -0.004045574892591413 0.0016250327256816242 -2.0194581957684165e-08
+  hidden position_6_0 -2.615371314281622e-12
+  hidden linearVelocity_6 9.00020830034733e-05 0.00022550174216605446 0.001188931099081608
+  hidden angularVelocity_6 -0.0040455572898582615 0.0016250251870960756 -2.012624275086915e-08
+  hidden linearVelocity_7 7.620254544859261e-05 0.00019116412051041118 0.0011980553026156933
+  hidden angularVelocity_7 -0.00404555277067774 0.0016250361323427427 -2.095177022961248e-08
+  translation -39.31049868961891 17.231603144364346 0.08567606777239675
+  rotation -0.034783086000787326 -0.023821109321439594 -0.9991109506350924 1.9415348253147757
+  controller "drone_inspector"
+  cameraSlot [
+    Camera {
+      fieldOfView 1.2
+      width 1280
+      height 720
+      near 0.2
+    }
+  ]
+}

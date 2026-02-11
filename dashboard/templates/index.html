@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structural Inspection Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- ================================================================ -->
+    <!--  HEADER                                                          -->
+    <!-- ================================================================ -->
+    <header>
+        <div class="header-left">
+            <div class="logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+            </div>
+            <h1>Drone Structural Inspection</h1>
+        </div>
+        <div class="header-right">
+            <div class="status-badge" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+            <div class="counter-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <path d="M21 15l-5-5L5 21"/>
+                </svg>
+                <span id="imageCount">0</span> images
+            </div>
+        </div>
+    </header>
+
+    <!-- ================================================================ -->
+    <!--  MAIN GRID                                                       -->
+    <!-- ================================================================ -->
+    <main>
+        <!-- LEFT PANEL: Live Image + Current Analysis -->
+        <section class="panel live-panel">
+            <div class="panel-header">
+                <h2>Live Inspection Feed</h2>
+                <span class="badge" id="currentRisk">--</span>
+            </div>
+            <div class="image-container" id="imageContainer">
+                <div class="placeholder" id="imagePlaceholder">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                    <p>Waiting for drone images...</p>
+                </div>
+                <img id="liveImage" src="" alt="Inspection image" style="display:none;">
+            </div>
+            <div class="current-analysis" id="currentAnalysis">
+                <div class="analysis-row">
+                    <span class="label">Image:</span>
+                    <span class="value" id="currentImageName">--</span>
+                </div>
+                <div class="analysis-row">
+                    <span class="label">Description:</span>
+                    <span class="value" id="currentDescription">--</span>
+                </div>
+                <div class="analysis-row">
+                    <span class="label">Surface Condition:</span>
+                    <span class="value" id="currentSurface">--</span>
+                </div>
+                <div class="analysis-row">
+                    <span class="label">Structural Integrity:</span>
+                    <span class="value" id="currentIntegrity">--</span>
+                </div>
+                <div class="defects-section" id="currentDefects">
+                    <span class="label">Defects:</span>
+                    <div class="defects-list" id="defectsList"></div>
+                </div>
+                <div class="actions-section">
+                    <span class="label">Recommended Actions:</span>
+                    <ul id="currentActions"></ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL: Analysis Timeline -->
+        <section class="panel timeline-panel">
+            <div class="panel-header">
+                <h2>Analysis Timeline</h2>
+            </div>
+            <div class="timeline-scroll" id="timeline">
+                <div class="timeline-empty" id="timelineEmpty">
+                    <p>No analyses yet. Start the drone inspection to see results here.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- BOTTOM PANEL: Statistics -->
+        <section class="panel stats-panel">
+            <div class="panel-header">
+                <h2>Inspection Summary</h2>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="statTotal">0</div>
+                    <div class="stat-label">Total Images</div>
+                </div>
+                <div class="stat-card stat-low">
+                    <div class="stat-number" id="statLow">0</div>
+                    <div class="stat-label">Low Risk</div>
+                </div>
+                <div class="stat-card stat-medium">
+                    <div class="stat-number" id="statMedium">0</div>
+                    <div class="stat-label">Medium Risk</div>
+                </div>
+                <div class="stat-card stat-high">
+                    <div class="stat-number" id="statHigh">0</div>
+                    <div class="stat-label">High Risk</div>
+                </div>
+                <div class="stat-card stat-critical">
+                    <div class="stat-number" id="statCritical">0</div>
+                    <div class="stat-label">Critical</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statHealth">--</div>
+                    <div class="stat-label">Health Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statDefects">0</div>
+                    <div class="stat-label">Total Defects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statConfidence">--</div>
+                    <div class="stat-label">Avg Confidence</div>
+                </div>
+            </div>
+            <!-- Risk distribution bar -->
+            <div class="risk-bar-container">
+                <div class="risk-bar-label">Risk Distribution</div>
+                <div class="risk-bar" id="riskBar">
+                    <div class="risk-segment risk-low" id="riskBarLow" style="width:0%"></div>
+                    <div class="risk-segment risk-medium" id="riskBarMedium" style="width:0%"></div>
+                    <div class="risk-segment risk-high" id="riskBarHigh" style="width:0%"></div>
+                    <div class="risk-segment risk-critical" id="riskBarCritical" style="width:0%"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================================================================ -->
+    <!--  JAVASCRIPT                                                      -->
+    <!-- ================================================================ -->
+    <script>
+    (function() {
+        // ---- State ----
+        const allAnalyses = [];
+        const riskCounts = { Low: 0, Medium: 0, High: 0, Critical: 0, Unknown: 0 };
+        let totalDefects = 0;
+        let confidenceSum = 0;
+
+        // ---- DOM refs ----
+        const connectionStatus = document.getElementById('connectionStatus');
+        const imageCount = document.getElementById('imageCount');
+        const currentRisk = document.getElementById('currentRisk');
+        const liveImage = document.getElementById('liveImage');
+        const imagePlaceholder = document.getElementById('imagePlaceholder');
+        const currentImageName = document.getElementById('currentImageName');
+        const currentDescription = document.getElementById('currentDescription');
+        const currentSurface = document.getElementById('currentSurface');
+        const currentIntegrity = document.getElementById('currentIntegrity');
+        const defectsList = document.getElementById('defectsList');
+        const currentActions = document.getElementById('currentActions');
+        const timeline = document.getElementById('timeline');
+        const timelineEmpty = document.getElementById('timelineEmpty');
+
+        // Stats
+        const statTotal = document.getElementById('statTotal');
+        const statLow = document.getElementById('statLow');
+        const statMedium = document.getElementById('statMedium');
+        const statHigh = document.getElementById('statHigh');
+        const statCritical = document.getElementById('statCritical');
+        const statHealth = document.getElementById('statHealth');
+        const statDefects = document.getElementById('statDefects');
+        const statConfidence = document.getElementById('statConfidence');
+
+        // Risk bar segments
+        const riskBarLow = document.getElementById('riskBarLow');
+        const riskBarMedium = document.getElementById('riskBarMedium');
+        const riskBarHigh = document.getElementById('riskBarHigh');
+        const riskBarCritical = document.getElementById('riskBarCritical');
+
+        // ---- Utility ----
+        function riskClass(risk) {
+            const r = (risk || '').toLowerCase();
+            if (r === 'low') return 'risk-low';
+            if (r === 'medium') return 'risk-medium';
+            if (r === 'high') return 'risk-high';
+            if (r === 'critical') return 'risk-critical';
+            return 'risk-unknown';
+        }
+
+        function riskLabel(risk) {
+            return risk || 'Unknown';
+        }
+
+        // ---- Process a single analysis entry ----
+        function processEntry(entry) {
+            allAnalyses.push(entry);
+            const a = entry.analysis || {};
+            const risk = (a.risk_assessment || {}).overall_risk || 'Unknown';
+
+            // Update risk counts
+            if (riskCounts[risk] !== undefined) riskCounts[risk]++;
+            else riskCounts['Unknown']++;
+
+            // Defect count
+            const defects = a.defects_found || [];
+            totalDefects += defects.length;
+
+            // Confidence
+            const conf = a.confidence_score || 0;
+            confidenceSum += conf;
+
+            // ---- Update live panel ----
+            if (entry.image_base64) {
+                liveImage.src = 'data:image/jpeg;base64,' + entry.image_base64;
+                liveImage.style.display = 'block';
+                imagePlaceholder.style.display = 'none';
+            }
+
+            currentImageName.textContent = entry.image_name || '--';
+            currentDescription.textContent = a.image_description || '--';
+            currentSurface.textContent = (a.surface_condition || {}).overall || '--';
+            currentIntegrity.textContent = (a.risk_assessment || {}).structural_integrity || '--';
+
+            // Risk badge
+            currentRisk.textContent = riskLabel(risk);
+            currentRisk.className = 'badge ' + riskClass(risk);
+
+            // Defects list
+            defectsList.innerHTML = '';
+            if (defects.length === 0) {
+                defectsList.innerHTML = '<span class="no-defects">No defects detected</span>';
+            } else {
+                defects.forEach(function(d) {
+                    const div = document.createElement('div');
+                    div.className = 'defect-item ' + riskClass(d.severity);
+                    div.innerHTML = '<strong>' + (d.type || 'Unknown') + '</strong> (' +
+                        (d.severity || '?') + ') &mdash; ' + (d.description || '');
+                    defectsList.appendChild(div);
+                });
+            }
+
+            // Actions
+            currentActions.innerHTML = '';
+            const actions = (a.risk_assessment || {}).recommended_actions || [];
+            actions.forEach(function(act) {
+                const li = document.createElement('li');
+                li.textContent = act;
+                currentActions.appendChild(li);
+            });
+
+            // ---- Timeline card ----
+            timelineEmpty.style.display = 'none';
+            const card = document.createElement('div');
+            card.className = 'timeline-card ' + riskClass(risk);
+            const ts = entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString() : '--';
+            card.innerHTML =
+                '<div class="tc-header">' +
+                    '<span class="tc-name">' + (entry.image_name || '?') + '</span>' +
+                    '<span class="tc-badge ' + riskClass(risk) + '">' + riskLabel(risk) + '</span>' +
+                '</div>' +
+                '<div class="tc-time">' + ts + '</div>' +
+                '<div class="tc-desc">' + (a.image_description || '') + '</div>' +
+                '<div class="tc-defects">' + defects.length + ' defect(s) found</div>';
+            // Prepend so newest is on top
+            timeline.insertBefore(card, timeline.firstChild);
+
+            // ---- Update stats ----
+            updateStats();
+        }
+
+        function updateStats() {
+            const total = allAnalyses.length;
+            statTotal.textContent = total;
+            imageCount.textContent = total;
+            statLow.textContent = riskCounts.Low;
+            statMedium.textContent = riskCounts.Medium;
+            statHigh.textContent = riskCounts.High;
+            statCritical.textContent = riskCounts.Critical;
+            statDefects.textContent = totalDefects;
+
+            // Health score: 100 = all low, 0 = all critical
+            if (total > 0) {
+                const weighted = riskCounts.Low * 100 + riskCounts.Medium * 66 +
+                    riskCounts.High * 33 + riskCounts.Critical * 0 +
+                    riskCounts.Unknown * 50;
+                const health = Math.round(weighted / total);
+                statHealth.textContent = health + '%';
+                statConfidence.textContent = (confidenceSum / total * 100).toFixed(0) + '%';
+            }
+
+            // Risk distribution bar
+            if (total > 0) {
+                riskBarLow.style.width = (riskCounts.Low / total * 100) + '%';
+                riskBarMedium.style.width = (riskCounts.Medium / total * 100) + '%';
+                riskBarHigh.style.width = (riskCounts.High / total * 100) + '%';
+                riskBarCritical.style.width = (riskCounts.Critical / total * 100) + '%';
+            }
+        }
+
+        // ---- Load history on page load ----
+        fetch('/api/history')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                data.forEach(processEntry);
+            })
+            .catch(function(err) {
+                console.error('Failed to load history:', err);
+            });
+
+        // ---- SSE connection ----
+        function connectSSE() {
+            const evtSource = new EventSource('/stream');
+
+            evtSource.onopen = function() {
+                connectionStatus.className = 'status-badge connected';
+                connectionStatus.querySelector('.status-text').textContent = 'Live';
+            };
+
+            evtSource.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'connected') {
+                        connectionStatus.className = 'status-badge connected';
+                        connectionStatus.querySelector('.status-text').textContent = 'Live';
+                        return;
+                    }
+                    processEntry(data);
+                } catch (e) {
+                    console.error('SSE parse error:', e);
+                }
+            };
+
+            evtSource.onerror = function() {
+                connectionStatus.className = 'status-badge disconnected';
+                connectionStatus.querySelector('.status-text').textContent = 'Reconnecting...';
+                evtSource.close();
+                setTimeout(connectSSE, 3000);
+            };
+        }
+
+        connectSSE();
+    })();
+    </script>
+</body>
+</html>
